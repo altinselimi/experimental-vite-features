@@ -2,18 +2,18 @@
 import { useRouter } from "vue-router";
 import { computed, onBeforeUnmount, ref, onMounted, nextTick } from "vue";
 import ShowsListView from "../components/ShowsListView.vue";
+import ShowsListViewSkeleton from "../components/ShowsListViewSkeleton.vue";
 import { useShowsStore } from "../stores/shows.js";
 import { Search } from "lucide-vue-next";
 const store = useShowsStore();
 const router = useRouter();
 
 onMounted(() => {
-  console.log("mounted");
   if (!listScrollPositions.value?.homeView) return;
-  console.log("ScrollTop should be:", listScrollPositions.value.homeView);
   document.documentElement.scrollTop = listScrollPositions.value.homeView;
 });
 
+const hasLoadedShows = computed(() => store.hasLoadedShows);
 const showsLists = computed(() => [
   {
     name: "comedy shows",
@@ -66,7 +66,7 @@ const listScrollPositions = computed(() => store.listScrollPositions);
         </button>
       </div>
     </div>
-    <div class="home-view__wrapper">
+    <div class="home-view__wrapper" v-if="hasLoadedShows">
       <ShowsListView
         :name="showsList.name"
         :shows="showsList.list"
@@ -78,6 +78,7 @@ const listScrollPositions = computed(() => store.listScrollPositions);
         v-for="showsList in showsLists"
       />
     </div>
+    <ShowsListViewSkeleton v-else />
   </div>
 </template>
 <style lang="scss">
